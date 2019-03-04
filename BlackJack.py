@@ -42,9 +42,104 @@ class Talia:
         karta = self.talia.pop()
         return karta
 
-talia_testowa = Talia()
-#print(talia_testowa)
-talia_testowa.tasuj()
-print(talia_testowa)
-print(Fore.RED + Back.BLUE + "Test")
-print(Style.BRIGHT + "Test1")
+class Reka:
+    """ Klasa definiiująca ile i jakie karty mamy w ręce """
+    def __init__(self):
+        self.cards = []
+        self.value = 0
+        self.aces = 0
+
+    def dodaj_karte(self,karta):
+        """ Dodanie karty do ręki """
+        self.cards.append(karta)
+        self.value += PUNKTY[karta.figura]
+        if karta.figura == 'As':
+            self.aces += 1
+    
+    def dopasuj_as(self):
+        while self.value > 21 and self.aces :
+            self.value -= 10
+            self.aces -= 1
+
+class Zetony:
+    """ Klasa żetony """
+    def __init__(self,total=100):
+        self.total = total
+        self.zaklad = 0
+
+    def wygrana(self):
+        """ Wygrany zaklad """
+        self.total += self.postaw
+
+    def przegrana(self):
+        """ Przegrany zaklad """
+        self.total -= self.postaw
+
+def przyjmij_zaklad(zetony):
+    while True:
+        try:
+            zetony.zaklad = int(input("Ile zetonow chcesz postawic?: "))
+        except:
+            print("Wprowadz prawidlowa wartosc")
+        else:
+            if zetony.zaklad > zetony.total :
+                print("Nie masz tyle zetonow")
+            else:
+                break
+
+def dobierz(talia,reka):
+    reka.dodaj_karte(talia.wez_karte())
+    reka.dopasuj_as()
+
+def dobierz_albo_stoj(talia,reka):
+    global playing
+    while True:
+        x = input("Dobierasz czy stoisz? h/s")
+        if x[0].lower() == 'h':
+            dobierz(talia,reka)
+        elif x[0].lower() == 's':
+            print("Koniec tury, kolej Dilera")
+            playing = False
+        else:
+            print("Wpisz h or s")
+            continue
+        break
+
+def gracz_wygral(player,dealer,zetony):
+    print("Gracz wygral!")
+    player.wygrana()
+    
+def gracz_przegral(player,dealer,zetony):
+    print("Gracz przegral!")
+    player.przegrana()
+    
+def dealer_wygral(player,dealer,zetony):
+    print("Dealer wygral!")
+    player.przegrana()
+    
+def dealer_przegral(player,dealer,zetony):
+    print("Dealer przegral!")
+    player.wygrana()
+    
+def remis():
+    print("Remis!")
+    
+
+while True:
+    print("Witamy w grze")
+    talia = Talia()
+    talia.tasuj()
+
+    gracz_reka = Reka()
+    gracz_reka.dodaj_karte(talia.wez_karte())
+    gracz_reka.dodaj_karte(talia.wez_karte())
+
+    dealer_reka = Reka()
+    dealer_reka.dodaj_karte(talia.wez_karte())
+    dealer_reka.dodaj_karte(talia.wez_karte())
+
+    gracz_zetony = Zetony()
+
+    przyjmij_zaklad(gracz_zetony)
+
+    

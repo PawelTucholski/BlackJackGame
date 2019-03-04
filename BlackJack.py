@@ -11,6 +11,8 @@ FIGURY = ('Dwójka', 'Trójka', 'Czwórka', 'Piątka', 'Szóstka', 'Siódemka', 
 PUNKTY = {'Dwójka':2, 'Trójka':3, 'Czwórka':4, 'Piątka':5, 'Szóstka':6, 'Siódemka':7, 'Ósemka':8,\
      'Dziewiątka':9, 'Dziesiątka':10, 'Walet':10, 'Dama':10, 'Król':10, 'As':11}
 
+playing = True
+
 class Karta:
     """Klasa tworząca kartę danej figury i danego koloru"""
     def __init__(self, figura, kolor):
@@ -69,11 +71,11 @@ class Zetony:
 
     def wygrana(self):
         """ Wygrany zaklad """
-        self.total += self.postaw
+        self.total += self.zaklad
 
     def przegrana(self):
         """ Przegrany zaklad """
-        self.total -= self.postaw
+        self.total -= self.zaklad
 
 def przyjmij_zaklad(zetony):
     while True:
@@ -94,7 +96,7 @@ def dobierz(talia,reka):
 def dobierz_albo_stoj(talia,reka):
     global playing
     while True:
-        x = input("Dobierasz czy stoisz? h/s")
+        x = input("Dobierasz czy stoisz? h/s: ")
         if x[0].lower() == 'h':
             dobierz(talia,reka)
         elif x[0].lower() == 's':
@@ -105,21 +107,33 @@ def dobierz_albo_stoj(talia,reka):
             continue
         break
 
+def show_some(player,dealer):
+    print("\nDealer's Hand:")
+    print(" <card hidden>")
+    print('',dealer.cards[1])  
+    print("\nPlayer's Hand:", *player.cards, sep='\n ')
+    
+def show_all(player,dealer):
+    print("\nDealer's Hand:", *dealer.cards, sep='\n ')
+    print("Dealer's Hand =",dealer.value)
+    print("\nPlayer's Hand:", *player.cards, sep='\n ')
+    print("Player's Hand =",player.value)
+
 def gracz_wygral(player,dealer,zetony):
     print("Gracz wygral!")
-    player.wygrana()
+    zetony.wygrana()
     
 def gracz_przegral(player,dealer,zetony):
     print("Gracz przegral!")
-    player.przegrana()
+    zetony.przegrana()
     
 def dealer_wygral(player,dealer,zetony):
     print("Dealer wygral!")
-    player.przegrana()
+    zetony.przegrana()
     
 def dealer_przegral(player,dealer,zetony):
     print("Dealer przegral!")
-    player.wygrana()
+    zetony.wygrana()
     
 def remis():
     print("Remis!")
@@ -141,5 +155,34 @@ while True:
     gracz_zetony = Zetony()
 
     przyjmij_zaklad(gracz_zetony)
+    show_some(gracz_reka, dealer_reka)
 
-    
+    while playing:
+        dobierz_albo_stoj(talia, gracz_reka)
+        show_some(gracz_reka, dealer_reka)
+
+        if gracz_reka.value > 21:
+            gracz_przegral(gracz_reka,dealer_reka,gracz_zetony)
+            break
+        if gracz_reka.value <= 21: 
+            while dealer_reka.value < 17:
+                dobierz(talia, dealer_reka)
+            show_all(gracz_reka, dealer_reka)
+
+            if dealer_reka.value > 21 :
+                dealer_przegral(gracz_reka, dealer_reka, gracz_zetony)
+            elif dealer_reka.value > gracz_reka.value:
+                dealer_wygral(gracz_reka, dealer_reka, gracz_zetony)
+            elif dealer_reka.value < gracz_reka.value:
+                gracz_wygral(gracz_reka, dealer_reka, gracz_zetony)
+            else:
+                remis(gracz_reka, dealer_reka)
+        print("\nTwoje zetony to: {}".format(gracz_zetony.total))
+        nowa_gra = input("Gramy od nowa? y/n")
+
+        if nowa_gra[0].lower() == 'y':
+            playing = True
+            continue
+        else:
+            print("Koniec gry")
+            break

@@ -2,7 +2,9 @@
 Black Jack Game
 """
 import random
-from colorama import init, Fore, Back, Style
+
+from colorama import Back, Fore, Style, init
+
 init(autoreset=True)
 
 KOLORY = ('Karo', 'Kier', 'Pik', 'Trefl')
@@ -178,7 +180,7 @@ while True:
             else:
                 remis(gracz_reka, dealer_reka)
         print("\nTwoje zetony to: {}".format(gracz_zetony.total))
-        nowa_gra = input("Gramy od nowa? y/n")
+        nowa_gra = input("Gramy od nowa? y/n: ")
 
         if nowa_gra[0].lower() == 'y':
             playing = True
@@ -186,3 +188,4 @@ while True:
         else:
             print("Koniec gry")
             break
+    break
